@@ -8,10 +8,22 @@ library(tidyverse)
 library(stargazer)
 
 df <- read_csv("data.csv")
+# Make it to percentage
+df$diff_growth <- 100*df$diff_growth 
 
 # Vanilla Regression
-lmod <- lm(switch ~ diff_growth + log1p(num_citation), df)
+lmod <- lm(switch ~ diff_growth + log1p(num_citation) + as.factor(year), df)
 summary(lmod)
+
+logit <- glm(switch ~ diff_growth + log1p(num_citation) + as.factor(year), 
+             family = binomial(link = "logit"), 
+             data = df)
+summary(logit)
+  
+probit <- glm(switch ~ diff_growth + log1p(num_citation) + as.factor(year), 
+                  family = binomial(link = "probit"), 
+                  data = df)
+summary(probit)
 
 #===============================================================
 # Regression by Number of Patents
@@ -29,15 +41,15 @@ df |>
   mutate(top_25_patent = ifelse(num_patents > top_25_patent, T, F)) -> df
 
 # Regression Estimates on the bottom 75% 
-lmod <- lm(switch ~ diff_growth + log1p(num_citation), df[!df$top_25_patent,])
+lmod <- lm(switch ~ diff_growth + log1p(num_citation) + as.factor(year), df[!df$top_25_patent,])
 summary(lmod)
 
 # Regression Estimates on the top 25% 
-lmod <- lm(switch ~ diff_growth + log1p(num_citation), df[df$top_25_patent,])
+lmod <- lm(switch ~ diff_growth + log1p(num_citation) + as.factor(year), df[df$top_25_patent,])
 summary(lmod)
 
 # Regression Estimates on interaction
-lmod <- lm(switch ~ diff_growth + log1p(num_citation)*top_25_patent, df)
+lmod <- lm(switch ~ diff_growth + log1p(num_citation)*top_25_patent + as.factor(year), df)
 summary(lmod)
 
 #===============================================================
