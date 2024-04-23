@@ -1,6 +1,9 @@
 #!/bin/bash  
 
-echo "Getting the Assignee Portfolio from Database!"
+echo "Get count of citations!"
+python3 00_NumCitation.py
+
+echo "Matching Assignees and Patents!"
 python3 01_AssigneePortfolio.py
 
 echo "CPC Classifications for the Patents"

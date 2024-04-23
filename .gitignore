@@ -1,3 +1,5 @@
 *.csv
 *.tsv
 credentials.py
+./__pycache__/
+./Literature Review

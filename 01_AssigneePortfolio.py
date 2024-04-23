@@ -1,6 +1,5 @@
 import polars as pl
 from datetime import date, datetime
-from credentials import uri
 
 """
 Author: Justino
@@ -12,18 +11,11 @@ they own and the corresponding dates and information
 
 if __name__ == '__main__':
 
-    # Query from database to join the patent dataset and the assignee dataset
-    query = """
+    p = pl.read_csv("g_patent.tsv", separator="\t", infer_schema_length = 0).select(["patent_id", "patent_date"])
+    a = pl.read_csv("g_assignee_disambiguated.tsv", separator="\t", infer_schema_length = 0).select(["patent_id", "assignee_id"])
 
-    SELECT patents.patent_id AS patent_id, patent_date AS date,  assignee_id
-    FROM patents 
-    INNER JOIN assignee 
-    ON patents.patent_id = assignee.patent_id
-    WHERE patent_date >= '1979-01-01'
-
-    """
-
-    df = pl.read_database_uri(query=query, uri=uri)
+    df = p.join(a, on = "patent_id", how = "inner")
+    df.columns = ['patent_id', 'date', 'assignee_id']
     
     # Sort by assignees and date
     df = df.sort(["assignee_id", "date"])
